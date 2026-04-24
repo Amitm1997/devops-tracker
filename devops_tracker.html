@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps Learning Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --border: #2a2a35;
+  --accent: #7c6af7;
+  --accent2: #4ecdc4;
+  --accent3: #f7c948;
+  --green: #52d68a;
+  --red: #f76b6b;
+  --text: #e8e8f0;
+  --muted: #7a7a90;
+  --mono: 'Space Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+
+/* grid bg */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:0.3;pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 16px 60px}
+
+/* header */
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+h1{font-size:clamp(22px,5vw,32px);font-weight:600;letter-spacing:-0.5px;color:var(--text)}
+h1 span{color:var(--accent)}
+.date-pill{font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border);padding:6px 12px;border-radius:20px;color:var(--muted);white-space:nowrap}
+
+/* stats row */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
+@media(max-width:500px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent)08,transparent);pointer-events:none}
+.stat-val{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:1px}
+.stat.streak .stat-val{color:var(--accent3)}
+.stat.done .stat-val{color:var(--green)}
+.stat.pct .stat-val{color:var(--accent)}
+.stat.left .stat-val{color:var(--accent2)}
+
+/* overall progress */
+.overall-bar-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:28px}
+.overall-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.overall-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:var(--mono)}
+.overall-pct{font-family:var(--mono);font-size:13px;color:var(--accent)}
+.bar-track{height:8px;background:var(--border);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width 0.5s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.phase-segments{display:grid;grid-template-columns:21fr 28fr 35fr;gap:4px;margin-top:8px}
+.seg{font-size:10px;color:var(--muted);font-family:var(--mono);text-align:center}
+
+/* phase tabs */
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s}
+.tab:hover{border-color:var(--accent);color:var(--accent)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab.active.python{background:var(--green);border-color:var(--green);color:#0d0d0f}
+.tab.active.devops{background:var(--accent2);border-color:var(--accent2);color:#0d0d0f}
+
+/* calendar */
+.phase-panel{display:none}
+.phase-panel.active{display:block}
+.week-section{margin-bottom:20px}
+.week-header{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-left:2px}
+.days-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day-name-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:4px}
+.dname{font-size:10px;color:var(--muted);text-align:center;font-family:var(--mono)}
+.day{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;transition:all 0.15s;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative}
+.day:hover{border-color:var(--accent);background:var(--surface2)}
+.day.done{background:#1a2e1e;border-color:#2d5c38}
+.day.today-marker{border-color:var(--accent3);box-shadow:0 0 0 1px var(--accent3)20}
+.day-num{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--muted)}
+.day.done .day-num{color:var(--green)}
+.day-topic{font-size:9px;color:var(--muted);line-height:1.3;text-align:center;max-width:58px}
+.day.done .day-topic{display:none}
+.check-icon{font-size:18px;display:none;color:var(--green)}
+.day.done .check-icon{display:block}
+.day.done .day-topic{display:none}
+
+/* tasks panel */
+.tasks-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:20px}
+.tasks-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:gap}
+.tasks-title{font-size:13px;font-weight:600;color:var(--text)}
+.tasks-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.task-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.task-item:last-child{border-bottom:none}
+.task-cb{width:17px;height:17px;min-width:17px;cursor:pointer;accent-color:var(--accent);margin-top:2px}
+.task-text{font-size:13px;color:var(--text);line-height:1.5}
+.task-text.crossed{text-decoration:line-through;color:var(--muted)}
+
+/* footer note */
+.footer-note{margin-top:32px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px}
+.footer-note span{color:var(--accent)}
+
+/* reset btn */
+.reset-btn{font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;float:right}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* mobile tweaks */
+@media(max-width:480px){
+  .day{min-height:52px;padding:6px 2px}
+  .day-topic{font-size:8px;max-width:44px}
+  .check-icon{font-size:15px}
+  .day-num{font-size:10px}
+  .dname{font-size:9px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div>
+      <div class="logo">// learning tracker</div>
+      <h1>DevOps <span>Journey</span></h1>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div class="date-pill" id="datepill"></div>
+      <button class="reset-btn" onclick="confirmReset()">↺ reset all</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat done"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Days done</div></div>
+    <div class="stat streak"><div class="stat-val" id="s-streak">0🔥</div><div class="stat-lbl">Streak</div></div>
+    <div class="stat pct"><div class="stat-val" id="s-pct">0%</div><div class="stat-lbl">Complete</div></div>
+    <div class="stat left"><div class="stat-val" id="s-left">84</div><div class="stat-lbl">Days left</div></div>
+  </div>
+
+  <div class="overall-bar-wrap">
+    <div class="overall-top">
+      <span class="overall-label">Overall progress</span>
+      <span class="overall-pct" id="o-pct">0 / 84 days</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="o-bar" style="width:0%"></div></div>
+    <div class="phase-segments">
+      <div class="seg" id="seg-linux">Linux 0/21</div>
+      <div class="seg" id="seg-python">Python 0/28</div>
+      <div class="seg" id="seg-devops">DevOps 0/35</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active linux" onclick="switchPhase('linux',this)">01 — Linux</button>
+    <button class="tab python" onclick="switchPhase('python',this)">02 — Python</button>
+    <button class="tab devops" onclick="switchPhase('devops',this)">03 — DevOps</button>
+  </div>
+
+  <div id="phase-linux" class="phase-panel active"></div>
+  <div id="phase-python" class="phase-panel"></div>
+  <div id="phase-devops" class="phase-panel"></div>
+
+  <div class="footer-note">progress saves locally on each device · built for <span>AM</span> · 84 days to DevOps</div>
+</div>
+
+<script>
+const PHASES = {
+  linux: {
+    weeks: [
+      { label: 'Week 1 — Navigation & Files', topics: ['pwd, ls, cd','mkdir, touch','cp, mv, rm','cat, less','head, tail','grep basics','Review day'] },
+      { label: 'Week 2 — Permissions & Users', topics: ['chmod, chown','sudo, su','User mgmt','Groups','File perms','ps, jobs','Review day'] },
+      { label: 'Week 3 — Intermediate Tools', topics: ['top, htop, kill','ping, netstat','curl, wget','apt, dpkg','awk, sed, cut','vim basics','Review day'] }
+    ],
+    tasks: [
+      ['Open terminal, run pwd, ls -la, and cd ~','Create a folder called practice and go inside it','Create 3 files using touch, view them with ls','Write text with echo > file.txt, read with cat','Delete a file with rm and move one with mv'],
+      ['Change permissions with chmod 755 on a file','Create a new user using sudo adduser testuser','Switch to that user with su testuser','List processes with ps aux | grep bash','Kill a process by its PID using kill'],
+      ['Monitor CPU and memory live with htop','Test connectivity with ping google.com -c 4','Download a file using curl -O [url]','Install a package: sudo apt install tree','Edit a file in vim: insert text, save with :wq']
+    ]
+  },
+  python: {
+    weeks: [
+      { label: 'Week 1 — Basics', topics: ['Variables, types','Input/output','Conditions','Loops','Functions','Lists, dicts','Review day'] },
+      { label: 'Week 2 — Intermediate', topics: ['File handling','try/except','os, sys modules','subprocess','String methods','List comprehension','Review day'] },
+      { label: 'Week 3 — DevOps Python', topics: ['requests lib','JSON parsing','YAML handling','boto3 intro','S3 with boto3','Script: monitor','Review day'] },
+      { label: 'Week 4 — Projects', topics: ['Project: backup','Project: monitor','Project: API','boto3 project','Code review','Push to GitHub','Review day'] }
+    ],
+    tasks: [
+      ['Install Python3, run your first print("Hello World!")','Write a script: take user input and print it back','Write if/elif/else conditions for a number check','Write a for loop printing 1 to 10','Write a function that adds two numbers and returns result'],
+      ['Write a script that reads a .txt file line by line','Handle FileNotFoundError using try/except','Use os.path.exists() to check if a file exists','Run a shell command using subprocess.run()','Parse a JSON string using json.loads() and print a key'],
+      ['Make a GET request to a public API with requests','Print specific fields from the JSON API response','Install pyyaml and read a .yaml config file','Install boto3 and configure AWS credentials','List your S3 buckets using boto3 in a script'],
+      ['Build a script that backs up a folder to another path','Build a CPU/disk monitor that alerts if usage > 80%','Call a REST API and save the response to a JSON file','Upload a local file to S3 using boto3','Push all 4 project scripts to a GitHub repo']
+    ]
+  },
+  devops: {
+    weeks: [
+      { label: 'Week 1 — Git & GitHub', topics: ['git init, add','commit, push','Branches','Merge, rebase','Pull requests','GitHub Actions','Review day'] },
+      { label: 'Week 2 — Docker', topics: ['Install Docker','Images, run','Dockerfile','docker-compose','Volumes, nets','Docker Hub','Review day'] },
+      { label: 'Week 3 — CI/CD', topics: ['GH Actions','Workflows','Pipeline build','Pipeline test','Pipeline deploy','Jenkins intro','Review day'] },
+      { label: 'Week 4 — Kubernetes', topics: ['K8s concepts','kubectl basics','Pods, services','Deployments','ConfigMaps','Namespaces','Review day'] },
+      { label: 'Week 5 — Terraform & Monitoring', topics: ['Terraform basics','HCL language','AWS + TF','Prometheus','Grafana setup','Dashboards','Review day'] }
+    ],
+    tasks: [
+      ['git init a new repo, add a file, and commit it','Push your repo to GitHub and create a README.md','Create a new branch, make a change, and commit','Merge your branch back to main','Open a pull request on GitHub and merge it'],
+      ['Install Docker Desktop (Windows) or Docker CE (Linux)','Pull nginx image and run: docker run -p 8080:80 nginx','Write a Dockerfile for a Python script and build it','Write docker-compose.yml with 2 services (app + db)','Push your custom image to Docker Hub'],
+      ['Create .github/workflows/main.yml in your repo','Trigger a workflow on push to main','Add a step that runs pytest on your Python project','Add a build step that creates a Docker image','Add a deploy step that pushes image to Docker Hub'],
+      ['Install minikube and kubectl on your machine','Run your first pod: kubectl run nginx --image=nginx','Expose it as a service and access in browser','Create a Deployment with 3 replicas via YAML','Use a ConfigMap to pass env variables to a pod'],
+      ['Install Terraform, write main.tf with AWS provider','terraform plan and apply to create an S3 bucket','Install Prometheus and scrape a local endpoint','Install Grafana and connect Prometheus as datasource','Create a dashboard showing CPU and memory metrics']
+    ]
+  }
+};
+
+const TOTAL = 84;
+let checked = JSON.parse(localStorage.getItem('devtrack_v2_checked') || '{}');
+let tasks = JSON.parse(localStorage.getItem('devtrack_v2_tasks') || '{}');
+let currentPhase = 'linux';
+
+function save() {
+  localStorage.setItem('devtrack_v2_checked', JSON.stringify(checked));
+  localStorage.setItem('devtrack_v2_tasks', JSON.stringify(tasks));
+}
+
+function getPhaseCount(p) {
+  const days = PHASES[p].weeks.length * 7;
+  let done = 0;
+  for(let i=0;i<days;i++) if(checked[p+'_'+i]) done++;
+  return done;
+}
+
+function updateStats() {
+  const ld = getPhaseCount('linux'), pd = getPhaseCount('python'), dd = getPhaseCount('devops');
+  const total = ld + pd + dd;
+  const pct = Math.round(total/TOTAL*100);
+  document.getElementById('s-done').textContent = total;
+  document.getElementById('s-pct').textContent = pct+'%';
+  document.getElementById('s-left').textContent = TOTAL - total;
+  document.getElementById('o-bar').style.width = pct+'%';
+  document.getElementById('o-pct').textContent = total+' / '+TOTAL+' days';
+  document.getElementById('seg-linux').textContent = 'Linux '+ld+'/21';
+  document.getElementById('seg-python').textContent = 'Python '+pd+'/28';
+  document.getElementById('seg-devops').textContent = 'DevOps '+dd+'/35';
+
+  // streak across all phases sequentially
+  const allKeys = [];
+  ['linux','python','devops'].forEach(p => {
+    const n = PHASES[p].weeks.length*7;
+    for(let i=0;i<n;i++) allKeys.push(p+'_'+i);
+  });
+  let streak = 0;
+  for(let i=allKeys.length-1;i>=0;i--) {
+    if(checked[allKeys[i]]) streak++;
+    else break;
+  }
+  // count from start
+  streak = 0;
+  let hit = false;
+  for(let i=allKeys.length-1;i>=0;i--) {
+    if(checked[allKeys[i]]) { streak++; hit=true; }
+    else if(hit) break;
+  }
+  document.getElementById('s-streak').textContent = streak+(streak>0?'🔥':'');
+}
+
+function buildCalendar(phase) {
+  const panel = document.getElementById('phase-'+phase);
+  panel.innerHTML = '';
+  const p = PHASES[phase];
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  p.weeks.forEach((week, wi) => {
+    const sec = document.createElement('div');
+    sec.className = 'week-section';
+
+    const wh = document.createElement('div');
+    wh.className = 'week-header';
+    wh.textContent = week.label;
+    sec.appendChild(wh);
+
+    const dnrow = document.createElement('div');
+    dnrow.className = 'day-name-row';
+    dayNames.forEach(d => { const s = document.createElement('div'); s.className='dname'; s.textContent=d; dnrow.appendChild(s); });
+    sec.appendChild(dnrow);
+
+    const drow = document.createElement('div');
+    drow.className = 'days-row';
+    week.topics.forEach((topic, di) => {
+      const idx = wi*7+di;
+      const key = phase+'_'+idx;
+      const cell = document.createElement('div');
+      cell.className = 'day'+(checked[key]?' done':'');
+      cell.innerHTML = `<span class="day-num">D${idx+1}</span><span class="day-topic">${topic}</span><span class="check-icon">✓</span>`;
+      cell.onclick = () => {
+        checked[key] = !checked[key];
+        cell.classList.toggle('done', checked[key]);
+        save();
+        updateStats();
+        renderTasks(phase);
+      };
+      drow.appendChild(cell);
+    });
+    sec.appendChild(drow);
+    panel.appendChild(sec);
+  });
+
+  renderTasks(phase);
+}
+
+function renderTasks(phase) {
+  const p = PHASES[phase];
+  const bank = p.tasks;
+  // find first incomplete week
+  let weekIdx = 0;
+  for(let w=0;w<p.weeks.length;w++) {
+    let allDone = true;
+    for(let d=0;d<7;d++) { if(!checked[phase+'_'+(w*7+d)]) { allDone=false; break; } }
+    if(!allDone) { weekIdx = w; break; }
+    if(w===p.weeks.length-1) weekIdx = w;
+  }
+
+  let card = document.getElementById('tasks-'+phase);
+  if(!card) {
+    card = document.createElement('div');
+    card.id = 'tasks-'+phase;
+    card.className = 'tasks-card';
+    document.getElementById('phase-'+phase).appendChild(card);
+  }
+  card.innerHTML = '';
+  const title = document.createElement('div');
+  title.innerHTML = `<div class="tasks-title">📋 Hands-on tasks</div><div class="tasks-sub">${p.weeks[weekIdx].label.toUpperCase()}</div>`;
+  title.style.marginBottom = '16px';
+  card.appendChild(title);
+
+  (bank[weekIdx]||[]).forEach((t,i) => {
+    const tkey = phase+'_w'+weekIdx+'_t'+i;
+    const row = document.createElement('div');
+    row.className = 'task-item';
+    const cb = document.createElement('input');
+    cb.type='checkbox'; cb.className='task-cb'; cb.checked=!!tasks[tkey];
+    cb.onchange = () => { tasks[tkey]=cb.checked; save(); span.className='task-text'+(cb.checked?' crossed':''); };
+    const span = document.createElement('span');
+    span.className='task-text'+(tasks[tkey]?' crossed':'');
+    span.textContent = t;
+    row.appendChild(cb); row.appendChild(span);
+    card.appendChild(row);
+  });
+}
+
+function switchPhase(p, btn) {
+  currentPhase = p;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.phase-panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('phase-'+p).classList.add('active');
+}
+
+function confirmReset() {
+  if(confirm('Reset ALL progress? This cannot be undone.')) {
+    localStorage.removeItem('devtrack_v2_checked');
+    localStorage.removeItem('devtrack_v2_tasks');
+    checked={}; tasks={};
+    ['linux','python','devops'].forEach(p => buildCalendar(p));
+    updateStats();
+  }
+}
+
+// date
+const now = new Date();
+document.getElementById('datepill').textContent = now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+// init
+['linux','python','devops'].forEach(p => buildCalendar(p));
+updateStats();
+</script>
+</body>
+</html>
