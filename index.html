@@ -23,20 +23,19 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-
-/* grid bg */
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:0.3;pointer-events:none;z-index:0}
-
 .app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 16px 60px}
-
-/* header */
 .topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;gap:12px;flex-wrap:wrap}
 .logo{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
 h1{font-size:clamp(22px,5vw,32px);font-weight:600;letter-spacing:-0.5px;color:var(--text)}
 h1 span{color:var(--accent)}
 .date-pill{font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border);padding:6px 12px;border-radius:20px;color:var(--muted);white-space:nowrap}
-
-/* stats row */
+.sync-status{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.sync-status.synced .sync-dot{background:var(--green)}
+.sync-status.syncing .sync-dot{background:var(--accent3);animation:pulse 1s infinite}
+.sync-status.error .sync-dot{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
 @media(max-width:500px){.stats{grid-template-columns:repeat(2,1fr)}}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;position:relative;overflow:hidden}
@@ -47,8 +46,6 @@ h1 span{color:var(--accent)}
 .stat.done .stat-val{color:var(--green)}
 .stat.pct .stat-val{color:var(--accent)}
 .stat.left .stat-val{color:var(--accent2)}
-
-/* overall progress */
 .overall-bar-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:28px}
 .overall-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .overall-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:var(--mono)}
@@ -57,16 +54,12 @@ h1 span{color:var(--accent)}
 .bar-fill{height:100%;border-radius:99px;transition:width 0.5s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--accent),var(--accent2))}
 .phase-segments{display:grid;grid-template-columns:21fr 28fr 35fr;gap:4px;margin-top:8px}
 .seg{font-size:10px;color:var(--muted);font-family:var(--mono);text-align:center}
-
-/* phase tabs */
 .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .tab{font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s}
 .tab:hover{border-color:var(--accent);color:var(--accent)}
 .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .tab.active.python{background:var(--green);border-color:var(--green);color:#0d0d0f}
 .tab.active.devops{background:var(--accent2);border-color:var(--accent2);color:#0d0d0f}
-
-/* calendar */
 .phase-panel{display:none}
 .phase-panel.active{display:block}
 .week-section{margin-bottom:20px}
@@ -74,38 +67,28 @@ h1 span{color:var(--accent)}
 .days-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .day-name-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:4px}
 .dname{font-size:10px;color:var(--muted);text-align:center;font-family:var(--mono)}
-.day{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;transition:all 0.15s;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative}
+.day{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;transition:all 0.15s;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .day:hover{border-color:var(--accent);background:var(--surface2)}
 .day.done{background:#1a2e1e;border-color:#2d5c38}
-.day.today-marker{border-color:var(--accent3);box-shadow:0 0 0 1px var(--accent3)20}
 .day-num{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--muted)}
 .day.done .day-num{color:var(--green)}
 .day-topic{font-size:9px;color:var(--muted);line-height:1.3;text-align:center;max-width:58px}
 .day.done .day-topic{display:none}
 .check-icon{font-size:18px;display:none;color:var(--green)}
 .day.done .check-icon{display:block}
-.day.done .day-topic{display:none}
-
-/* tasks panel */
 .tasks-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:20px}
-.tasks-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:gap}
 .tasks-title{font-size:13px;font-weight:600;color:var(--text)}
-.tasks-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.tasks-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px;margin-bottom:16px}
 .task-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
 .task-item:last-child{border-bottom:none}
 .task-cb{width:17px;height:17px;min-width:17px;cursor:pointer;accent-color:var(--accent);margin-top:2px}
 .task-text{font-size:13px;color:var(--text);line-height:1.5}
 .task-text.crossed{text-decoration:line-through;color:var(--muted)}
-
-/* footer note */
 .footer-note{margin-top:32px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px}
 .footer-note span{color:var(--accent)}
-
-/* reset btn */
-.reset-btn{font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;float:right}
+.reset-btn{font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s}
 .reset-btn:hover{border-color:var(--red);color:var(--red)}
-
-/* mobile tweaks */
+.topright{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 @media(max-width:480px){
   .day{min-height:52px;padding:6px 2px}
   .day-topic{font-size:8px;max-width:44px}
@@ -122,8 +105,9 @@ h1 span{color:var(--accent)}
       <div class="logo">// learning tracker</div>
       <h1>DevOps <span>Journey</span></h1>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+    <div class="topright">
       <div class="date-pill" id="datepill"></div>
+      <div class="sync-status" id="sync-status"><div class="sync-dot"></div><span id="sync-text">Connecting...</span></div>
       <button class="reset-btn" onclick="confirmReset()">↺ reset all</button>
     </div>
   </div>
@@ -158,10 +142,28 @@ h1 span{color:var(--accent)}
   <div id="phase-python" class="phase-panel"></div>
   <div id="phase-devops" class="phase-panel"></div>
 
-  <div class="footer-note">progress saves locally on each device · built for <span>AM</span> · 84 days to DevOps</div>
+  <div class="footer-note">☁️ cloud synced across all devices · built for <span>Amit</span> · 84 days to DevOps</div>
 </div>
 
-<script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDB0Ev_QUKszbviiW4Wc8RKgO5iKo5BQoQ",
+  authDomain: "aws-devops-tracker.firebaseapp.com",
+  projectId: "aws-devops-tracker",
+  storageBucket: "aws-devops-tracker.firebasestorage.app",
+  messagingSenderId: "929369363253",
+  appId: "1:929369363253:web:60710ec2769db6e171f27c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const DOC = doc(db, "tracker", "amit");
+const TOTAL = 84;
+
 const PHASES = {
   linux: {
     weeks: [
@@ -207,14 +209,54 @@ const PHASES = {
   }
 };
 
-const TOTAL = 84;
-let checked = JSON.parse(localStorage.getItem('devtrack_v2_checked') || '{}');
-let tasks = JSON.parse(localStorage.getItem('devtrack_v2_tasks') || '{}');
+let checked = {};
+let tasks = {};
 let currentPhase = 'linux';
+let saveTimeout = null;
 
-function save() {
-  localStorage.setItem('devtrack_v2_checked', JSON.stringify(checked));
-  localStorage.setItem('devtrack_v2_tasks', JSON.stringify(tasks));
+function setSyncStatus(state, text) {
+  const el = document.getElementById('sync-status');
+  const t = document.getElementById('sync-text');
+  el.className = 'sync-status ' + state;
+  t.textContent = text;
+}
+
+async function loadFromCloud() {
+  try {
+    setSyncStatus('syncing', 'Loading...');
+    const snap = await getDoc(DOC);
+    if (snap.exists()) {
+      const data = snap.data();
+      checked = data.checked || {};
+      tasks = data.tasks || {};
+    }
+    setSyncStatus('synced', 'Synced ✓');
+    ['linux','python','devops'].forEach(p => buildCalendar(p));
+    updateStats();
+  } catch(e) {
+    setSyncStatus('error', 'Offline');
+    // fallback to localStorage
+    checked = JSON.parse(localStorage.getItem('devtrack_checked') || '{}');
+    tasks = JSON.parse(localStorage.getItem('devtrack_tasks') || '{}');
+    ['linux','python','devops'].forEach(p => buildCalendar(p));
+    updateStats();
+  }
+}
+
+function saveToCloud() {
+  clearTimeout(saveTimeout);
+  setSyncStatus('syncing', 'Saving...');
+  saveTimeout = setTimeout(async () => {
+    try {
+      await setDoc(DOC, { checked, tasks, updatedAt: new Date().toISOString() });
+      setSyncStatus('synced', 'Synced ✓');
+      // also save locally as backup
+      localStorage.setItem('devtrack_checked', JSON.stringify(checked));
+      localStorage.setItem('devtrack_tasks', JSON.stringify(tasks));
+    } catch(e) {
+      setSyncStatus('error', 'Sync failed');
+    }
+  }, 800);
 }
 
 function getPhaseCount(p) {
@@ -236,24 +278,15 @@ function updateStats() {
   document.getElementById('seg-linux').textContent = 'Linux '+ld+'/21';
   document.getElementById('seg-python').textContent = 'Python '+pd+'/28';
   document.getElementById('seg-devops').textContent = 'DevOps '+dd+'/35';
-
-  // streak across all phases sequentially
   const allKeys = [];
   ['linux','python','devops'].forEach(p => {
     const n = PHASES[p].weeks.length*7;
     for(let i=0;i<n;i++) allKeys.push(p+'_'+i);
   });
   let streak = 0;
-  for(let i=allKeys.length-1;i>=0;i--) {
+  for(let i=0;i<allKeys.length;i++) {
     if(checked[allKeys[i]]) streak++;
     else break;
-  }
-  // count from start
-  streak = 0;
-  let hit = false;
-  for(let i=allKeys.length-1;i>=0;i--) {
-    if(checked[allKeys[i]]) { streak++; hit=true; }
-    else if(hit) break;
   }
   document.getElementById('s-streak').textContent = streak+(streak>0?'🔥':'');
 }
@@ -263,21 +296,17 @@ function buildCalendar(phase) {
   panel.innerHTML = '';
   const p = PHASES[phase];
   const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
   p.weeks.forEach((week, wi) => {
     const sec = document.createElement('div');
     sec.className = 'week-section';
-
     const wh = document.createElement('div');
     wh.className = 'week-header';
     wh.textContent = week.label;
     sec.appendChild(wh);
-
     const dnrow = document.createElement('div');
     dnrow.className = 'day-name-row';
     dayNames.forEach(d => { const s = document.createElement('div'); s.className='dname'; s.textContent=d; dnrow.appendChild(s); });
     sec.appendChild(dnrow);
-
     const drow = document.createElement('div');
     drow.className = 'days-row';
     week.topics.forEach((topic, di) => {
@@ -289,7 +318,7 @@ function buildCalendar(phase) {
       cell.onclick = () => {
         checked[key] = !checked[key];
         cell.classList.toggle('done', checked[key]);
-        save();
+        saveToCloud();
         updateStats();
         renderTasks(phase);
       };
@@ -298,14 +327,12 @@ function buildCalendar(phase) {
     sec.appendChild(drow);
     panel.appendChild(sec);
   });
-
   renderTasks(phase);
 }
 
 function renderTasks(phase) {
   const p = PHASES[phase];
   const bank = p.tasks;
-  // find first incomplete week
   let weekIdx = 0;
   for(let w=0;w<p.weeks.length;w++) {
     let allDone = true;
@@ -313,7 +340,6 @@ function renderTasks(phase) {
     if(!allDone) { weekIdx = w; break; }
     if(w===p.weeks.length-1) weekIdx = w;
   }
-
   let card = document.getElementById('tasks-'+phase);
   if(!card) {
     card = document.createElement('div');
@@ -324,16 +350,14 @@ function renderTasks(phase) {
   card.innerHTML = '';
   const title = document.createElement('div');
   title.innerHTML = `<div class="tasks-title">📋 Hands-on tasks</div><div class="tasks-sub">${p.weeks[weekIdx].label.toUpperCase()}</div>`;
-  title.style.marginBottom = '16px';
   card.appendChild(title);
-
   (bank[weekIdx]||[]).forEach((t,i) => {
     const tkey = phase+'_w'+weekIdx+'_t'+i;
     const row = document.createElement('div');
     row.className = 'task-item';
     const cb = document.createElement('input');
     cb.type='checkbox'; cb.className='task-cb'; cb.checked=!!tasks[tkey];
-    cb.onchange = () => { tasks[tkey]=cb.checked; save(); span.className='task-text'+(cb.checked?' crossed':''); };
+    cb.onchange = () => { tasks[tkey]=cb.checked; saveToCloud(); span.className='task-text'+(cb.checked?' crossed':''); };
     const span = document.createElement('span');
     span.className='task-text'+(tasks[tkey]?' crossed':'');
     span.textContent = t;
@@ -342,7 +366,7 @@ function renderTasks(phase) {
   });
 }
 
-function switchPhase(p, btn) {
+window.switchPhase = function(p, btn) {
   currentPhase = p;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -350,23 +374,18 @@ function switchPhase(p, btn) {
   document.getElementById('phase-'+p).classList.add('active');
 }
 
-function confirmReset() {
+window.confirmReset = function() {
   if(confirm('Reset ALL progress? This cannot be undone.')) {
-    localStorage.removeItem('devtrack_v2_checked');
-    localStorage.removeItem('devtrack_v2_tasks');
     checked={}; tasks={};
+    saveToCloud();
     ['linux','python','devops'].forEach(p => buildCalendar(p));
     updateStats();
   }
 }
 
-// date
-const now = new Date();
-document.getElementById('datepill').textContent = now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+document.getElementById('datepill').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 
-// init
-['linux','python','devops'].forEach(p => buildCalendar(p));
-updateStats();
+loadFromCloud();
 </script>
 </body>
 </html>
